@@ -5,6 +5,8 @@ import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import Wizard from './pages/Wizard';
+import Viewer from './pages/Viewer';
 
 // Protected Route Wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -34,6 +36,22 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Dashboard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/create" 
+            element={
+              <ProtectedRoute>
+                <Wizard />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/view" 
+            element={
+              <ProtectedRoute>
+                <Viewer />
               </ProtectedRoute>
             } 
           />
