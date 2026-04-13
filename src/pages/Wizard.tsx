@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { generatePresentationStructure, generateImage } from '../services/aiService';
 import LoadingScreen from '../components/LoadingScreen';
 import { PresentationData, Slide } from '../types';
-import { ArrowRight, Sparkles, AlertCircle, ArrowLeft, Key } from 'lucide-react';
+import { ArrowRight, Sparkles, AlertCircle, ArrowLeft } from 'lucide-react';
 
 const THEMES = [
   { id: 'Minimalist', desc: 'Clean, white/gray, professional' },
@@ -20,10 +20,6 @@ export default function Wizard() {
   const [language, setLanguage] = useState('English');
   const [theme, setTheme] = useState('Minimalist');
   
-  // API Keys state
-  const [geminiKey, setGeminiKey] = useState('');
-  const [hfKey, setHfKey] = useState('');
-  
   const [loadingStep, setLoadingStep] = useState<'none' | 'text' | 'images'>('none');
   const [error, setError] = useState('');
 
@@ -36,7 +32,7 @@ export default function Wizard() {
       setLoadingStep('text');
       
       // Step A: Generate text structure
-      const structure = await generatePresentationStructure(topic, language, geminiKey);
+      const structure = await generatePresentationStructure(topic, language);
       
       if (!structure || !structure.slides || structure.slides.length === 0) {
         throw new Error("Invalid structure returned from AI");
@@ -48,7 +44,7 @@ export default function Wizard() {
       const slidesWithImages: Slide[] = await Promise.all(
         structure.slides.map(async (slide: Slide) => {
           try {
-            const imageUrl = await generateImage(slide.image_prompt_english, theme, hfKey);
+            const imageUrl = await generateImage(slide.image_prompt_english, theme);
             return { ...slide, imageUrl };
           } catch (imgErr) {
             console.error("Image generation failed for slide", imgErr);
@@ -99,39 +95,6 @@ export default function Wizard() {
         )}
 
         <form onSubmit={handleGenerate} className="bg-white shadow-sm rounded-2xl p-8 border border-slate-100">
-          {/* API Keys Section */}
-          <div className="mb-8 p-6 bg-slate-50 rounded-xl border border-slate-200">
-            <div className="flex items-center gap-2 mb-4">
-              <Key className="w-5 h-5 text-slate-500" />
-              <h3 className="text-lg font-semibold text-slate-900">API Keys (Optional)</h3>
-            </div>
-            <p className="text-sm text-slate-500 mb-4">
-              If your environment variables are not set on Vercel, you can paste your keys here. They will only be used for this session.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Gemini API Key</label>
-                <input
-                  type="password"
-                  value={geminiKey}
-                  onChange={(e) => setGeminiKey(e.target.value)}
-                  placeholder="AIzaSy..."
-                  className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-slate-700 mb-1">Hugging Face API Key</label>
-                <input
-                  type="password"
-                  value={hfKey}
-                  onChange={(e) => setHfKey(e.target.value)}
-                  placeholder="hf_..."
-                  className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none"
-                />
-              </div>
-            </div>
-          </div>
-
           {/* Topic */}
           <div className="mb-8">
             <label className="block text-sm font-semibold text-slate-900 mb-2">
