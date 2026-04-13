@@ -1,9 +1,20 @@
 import { GoogleGenAI } from '@google/genai';
 
-// Initialize Gemini using the key provided by AI Studio environment
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+let aiClient: GoogleGenAI | null = null;
+
+function getAIClient(): GoogleGenAI {
+  if (!aiClient) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is missing. Please check your environment variables.");
+    }
+    aiClient = new GoogleGenAI({ apiKey });
+  }
+  return aiClient;
+}
 
 export async function generatePresentationStructure(topic: string, language: string) {
+  const ai = getAIClient();
   const prompt = `You are an expert presentation creator. Create a presentation about "${topic}" in the following language: ${language}.
 You MUST return ONLY a clean JSON object without any markdown formatting around it (no \`\`\`json).
 Structure:
