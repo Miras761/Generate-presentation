@@ -1,0 +1,6 @@
+{
+  "name": "AI Presentation Generator",
+  "description": "An AI-powered presentation generator for students using Gemini and Hugging Face.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
