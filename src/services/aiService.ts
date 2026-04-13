@@ -1,20 +1,15 @@
 import { GoogleGenAI } from '@google/genai';
 
-let aiClient: GoogleGenAI | null = null;
-
-function getAIClient(): GoogleGenAI {
-  if (!aiClient) {
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-      throw new Error("GEMINI_API_KEY is missing. Please check your environment variables.");
-    }
-    aiClient = new GoogleGenAI({ apiKey });
+function getAIClient(customKey?: string): GoogleGenAI {
+  const apiKey = customKey || process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is missing. Please provide it in the form.");
   }
-  return aiClient;
+  return new GoogleGenAI({ apiKey });
 }
 
-export async function generatePresentationStructure(topic: string, language: string) {
-  const ai = getAIClient();
+export async function generatePresentationStructure(topic: string, language: string, customKey?: string) {
+  const ai = getAIClient(customKey);
   const prompt = `You are an expert presentation creator. Create a presentation about "${topic}" in the following language: ${language}.
 You MUST return ONLY a clean JSON object without any markdown formatting around it (no \`\`\`json).
 Structure:
@@ -49,9 +44,9 @@ Provide exactly 5 slides.`;
   }
 }
 
-export async function generateImage(prompt: string, theme: string): Promise<string> {
-  const hfKey = import.meta.env.VITE_HUGGINGFACE_API_KEY;
-  if (!hfKey) throw new Error("Hugging Face API key is missing. Please add VITE_HUGGINGFACE_API_KEY in settings.");
+export async function generateImage(prompt: string, theme: string, customKey?: string): Promise<string> {
+  const hfKey = customKey || import.meta.env.VITE_HUGGINGFACE_API_KEY;
+  if (!hfKey) throw new Error("Hugging Face API key is missing. Please provide it in the form.");
 
   const fullPrompt = `${prompt}, ${theme} style, masterpiece, 8k, highly detailed, beautiful lighting`;
   
