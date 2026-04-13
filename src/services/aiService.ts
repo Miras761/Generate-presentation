@@ -1,13 +1,14 @@
 import { GoogleGenAI } from '@google/genai';
 
-// User's provided free tier key
-const GEMINI_API_KEY = "AIzaSyCXJ1-ih4vjCFTsRjBxrR-LOVDeRE9XRbg";
-
 let aiClient: GoogleGenAI | null = null;
 
 function getAIClient(): GoogleGenAI {
   if (!aiClient) {
-    aiClient = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      throw new Error("GEMINI_API_KEY is missing. Please add it to the Secrets panel.");
+    }
+    aiClient = new GoogleGenAI({ apiKey });
   }
   return aiClient;
 }
@@ -30,7 +31,7 @@ Structure:
 Provide exactly 5 slides.`;
 
   const response = await ai.models.generateContent({
-    model: 'gemini-2.5-flash',
+    model: 'gemini-1.5-flash',
     contents: prompt,
     config: {
       responseMimeType: "application/json",
